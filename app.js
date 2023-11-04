@@ -1,6 +1,9 @@
-const http = require('http');
+const mongoose = require('mongoose');
+const express = require('express');
 const { PORT= 3000 } = process.env;
 
-const server = http.createServer();
+const app = express();
 
-server.listen(PORT);
+mongoose.connect('mongodb://localhost:27017/mestodb');
+
+app.listen(PORT);
