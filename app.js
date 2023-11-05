@@ -3,11 +3,14 @@ const { PORT = 3000 } = process.env;
 const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
 
 const app = express();
+
+app.use(helmet());
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
