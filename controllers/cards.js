@@ -1,15 +1,16 @@
 const router = require('express').Router();
 const mongoose = require('mongoose');
 const Card = require('../models/card');
+const { ValidationError, NotFoundError, ServerError } = require('../utils/errorStatusCode');
 
 module.exports.getCards = router.get('/cards', (req, res) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(400).send({ message: 'Карточки не найдены' });
+        return res.status(NotFoundError).send({ message: 'Карточки не найдены' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(ServerError).send({ message: 'Произошла ошибка' });
     });
 });
 
@@ -20,9 +21,9 @@ module.exports.createCard = router.post('/cards', (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Введены некоректные данные' });
+        return res.status(ValidationError).send({ message: 'Введены некоректные данные' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(ServerError).send({ message: 'Произошла ошибка' });
     });
 });
 
@@ -31,9 +32,9 @@ module.exports.deleteCard = router.delete('/cards/:cardId', (req, res) => {
     .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
+        return res.status(NotFoundError).send({ message: 'Карточка не найдена' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(ServerError).send({ message: 'Произошла ошибка' });
     });
 });
 
@@ -46,12 +47,12 @@ module.exports.likeCard = router.put('/cards/:cardId/likes', (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
+        return res.status(NotFoundError).send({ message: 'Карточка не найдена' });
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Введены некоректные данные' });
+        return res.status(ValidationError).send({ message: 'Введены некоректные данные' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(ServerError).send({ message: 'Произошла ошибка' });
     });
 });
 
@@ -64,11 +65,11 @@ module.exports.dislikeCard = router.delete('/cards/:cardId/likes', (req, res) =>
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(404).send({ message: 'Карточка не найдена' });
+        return res.status(NotFoundError).send({ message: 'Карточка не найдена' });
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(400).send({ message: 'Введены некоректные данные' });
+        return res.status(ValidationError).send({ message: 'Введены некоректные данные' });
       }
-      return res.status(500).send({ message: 'Произошла ошибка' });
+      return res.status(ServerError).send({ message: 'Произошла ошибка' });
     });
 });
