@@ -7,7 +7,7 @@ module.exports.getUsers = router.get('/users', (req, res) => {
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
 });
 
-module.exports.getUser = router.get('/user/:userId', (req, res) => {
+module.exports.getUser = router.get('/users/:userId', (req, res) => {
   User.findById(req.params.userId)
     .then((user) => res.send({ data: user }))
     .catch(() => res.status(500).send({ message: 'Произошла ошибка' }));
