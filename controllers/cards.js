@@ -28,7 +28,7 @@ module.exports.createCard = router.post('/cards', (req, res) => {
 
 module.exports.deleteCard = router.delete('/cards/:cardId', (req, res) => {
   Card.findByIdAndDelete(req.params.cardId)
-    .then((card) => res.send({ data: card }))
+    .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         return res.status(404).send({ message: 'Карточка не найдена' });

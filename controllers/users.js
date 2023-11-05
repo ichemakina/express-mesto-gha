@@ -39,7 +39,7 @@ module.exports.createUser = router.post('/users', (req, res) => {
 
 module.exports.updateUser = router.patch('/users/me', (req, res) => {
   const { name, about } = req.body;
-  User.findByIdAndUpdate(req.user._id, { name, about })
+  User.findByIdAndUpdate(req.user._id, { name, about }, { new: true })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
@@ -55,7 +55,7 @@ module.exports.updateUser = router.patch('/users/me', (req, res) => {
 module.exports.updateUserAvatar = router.patch('/users/me/avatar', (req, res) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.send({ data: user }, { new: true }))
     .catch((err) => {
       if (err instanceof mongoose.Error.CastError) {
         return res.status(404).send({ message: 'Пользователь не найден' });
