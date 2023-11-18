@@ -8,7 +8,6 @@ const ForbiddenError = require('../utils/forbiddenError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .orFail()
     .then((cards) => res.send({ data: cards }))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {

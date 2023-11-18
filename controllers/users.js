@@ -6,12 +6,10 @@ const User = require('../models/user');
 const Created = 200;
 const NotFoundError = require('../utils/notFoundError');
 const ValidationError = require('../utils/validationError');
-const UnauthorizedError = require('../utils/unauthorizedError');
 const ConflictError = require('../utils/conflictError');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .orFail()
     .then((users) => res.send({ data: users }))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
@@ -75,9 +73,6 @@ module.exports.updateUser = (req, res, next) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      if (err instanceof mongoose.Error.CastError) {
-        return next(new ValidationError('Пользователь не найден'));
-      }
       return next();
     });
 };
@@ -91,9 +86,6 @@ module.exports.updateUserAvatar = (req, res, next) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      if (err instanceof mongoose.Error.CastError) {
-        return next(new ValidationError('Пользователь не найден'));
-      }
       return next();
     });
 };
@@ -106,7 +98,5 @@ module.exports.login = (req, res, next) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
       return res.send({ token });
     })
-    .catch(() => {
-      next(new UnauthorizedError('Ошибка авторизации'));
-    });
+    .catch((err) => next(err));
 };
