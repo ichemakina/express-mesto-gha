@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
+const cookieParser = require('cookie-parser');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
@@ -19,17 +20,10 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '654624af0a2e8bda02cc7c6e',
-  };
-
-  next();
-});
-
 app.post('/signin', login);
 app.post('/signup', createUser);
 
+app.use(cookieParser());
 app.use(auth);
 
 app.use(users);

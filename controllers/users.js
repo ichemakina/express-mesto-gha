@@ -19,7 +19,13 @@ module.exports.getUsers = (req, res) => {
 };
 
 module.exports.getUser = (req, res) => {
-  User.findById(req.params.userId)
+  let userId;
+  if (req.params.userId) {
+    userId = req.params.userId;
+  } else {
+    userId = req.user._id;
+  }
+  User.findById(userId)
     .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -95,12 +101,7 @@ module.exports.login = (req, res) => {
   return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
-      return res
-        .cookie('jwt', token, {
-          maxAge: 3600000 * 24 * 7,
-          httpOnly: true,
-        })
-        .end();
+      return res.send({ token });
     })
     .catch(() => {
       res.status(UnauthorizedError).send({ message: 'Ошибка авторизации' });
