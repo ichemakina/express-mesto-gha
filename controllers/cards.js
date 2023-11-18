@@ -3,7 +3,6 @@ const Card = require('../models/card');
 
 const Created = 200;
 const NotFoundError = require('../utils/notFoundError');
-const ServerError = require('../utils/serverError');
 const ValidationError = require('../utils/validationError');
 const ForbiddenError = require('../utils/forbiddenError');
 
@@ -15,7 +14,7 @@ module.exports.getCards = (req, res, next) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFoundError('Карточки не найдены'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
@@ -24,7 +23,7 @@ module.exports.createCard = (req, res, next) => {
 
   Card.create({ name, link, owner: req.user._id })
     .then((card) => res.status(Created).send({ data: card }))
-    .catch(() => next(new ServerError('Произошла ошибка')));
+    .catch(() => next());
 };
 
 module.exports.deleteCard = (req, res, next) => {
@@ -50,7 +49,7 @@ module.exports.deleteCard = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new ValidationError('Карточка не найдена'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
@@ -69,7 +68,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new ValidationError('Карточка не найдена'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
@@ -88,6 +87,6 @@ module.exports.dislikeCard = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new ValidationError('Карточка не найдена'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };

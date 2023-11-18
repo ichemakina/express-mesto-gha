@@ -5,7 +5,6 @@ const User = require('../models/user');
 
 const Created = 200;
 const NotFoundError = require('../utils/notFoundError');
-const ServerError = require('../utils/serverError');
 const ValidationError = require('../utils/validationError');
 const UnauthorizedError = require('../utils/unauthorizedError');
 const ConflictError = require('../utils/conflictError');
@@ -18,7 +17,7 @@ module.exports.getUsers = (req, res, next) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFoundError('Пользователи не найдены'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
@@ -39,7 +38,7 @@ module.exports.getUser = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new ValidationError('Пользователь не найден'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
@@ -63,7 +62,7 @@ module.exports.createUser = (req, res, next) => {
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с таким email уже существует'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
@@ -79,7 +78,7 @@ module.exports.updateUser = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new ValidationError('Пользователь не найден'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
@@ -95,7 +94,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new ValidationError('Пользователь не найден'));
       }
-      return next(new ServerError('Произошла ошибка'));
+      return next();
     });
 };
 
