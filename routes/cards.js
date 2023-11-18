@@ -15,19 +15,19 @@ router.post('/cards', celebrate({
 
 router.delete('/cards/:cardId', celebrate({
   query: {
-    cardId: Joi.string().required(),
+    cardId: Joi.string().hex().required(),
   },
 }), deleteCard);
 
 router.put('/cards/:cardId/likes', celebrate({
   query: {
-    cardId: Joi.string().required(),
+    cardId: Joi.string().hex().required(),
   },
 }), likeCard);
 
 router.delete('/cards/:cardId/likes', celebrate({
   query: {
-    cardId: Joi.string().required(),
+    cardId: Joi.string().hex().required(),
   },
 }), dislikeCard);
 

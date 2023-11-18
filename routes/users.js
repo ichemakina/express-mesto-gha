@@ -11,7 +11,7 @@ router.get('/users/me', getUser);
 
 router.get('/users/:userId', celebrate({
   query: {
-    userId: Joi.string().required(),
+    userId: Joi.string().hex().required(),
   },
 }), getUser);
 
