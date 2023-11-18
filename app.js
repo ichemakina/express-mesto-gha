@@ -12,6 +12,7 @@ const cards = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 const handleError = require('./middlewares/handleError');
+const NotFoundError = require('./utils/notFoundError');
 
 const { URL_PATTERN } = require('./utils/constants');
 
@@ -45,6 +46,8 @@ app.use(auth);
 
 app.use(users);
 app.use(cards);
+
+app.use((req, res, next) => next(new NotFoundError('Некорректный URL')));
 
 app.use(errors());
 app.use(handleError);
