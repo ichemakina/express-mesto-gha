@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Card = require('../models/card');
 const {
-  Created, ValidationError, NotFoundError, ServerError,
+  Created, ValidationError, ForbiddenError, NotFoundError, ServerError,
 } = require('../utils/statusCode');
 
 module.exports.getCards = (req, res) => {
@@ -30,10 +30,22 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.deleteCard = (req, res) => {
-  Card.findByIdAndDelete(req.params.cardId)
+  const { cardId } = req.params;
+  Card.findById(cardId)
     .orFail()
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        return Promise.reject(new Error('Недостаточно прав'));
+      }
+      return Card
+        .findByIdAndDelete(cardId)
+        .orFail();
+    })
     .then(() => res.send({ message: 'Карточка удалена' }))
     .catch((err) => {
+      if (err.message === 'Недостаточно прав') {
+        return res.status(ForbiddenError).send({ message: 'Недостаточно прав' });
+      }
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
         return res.status(NotFoundError).send({ message: 'Карточка не найдена' });
       }
