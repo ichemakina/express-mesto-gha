@@ -7,24 +7,24 @@ const {
   getUsers, getUser, updateUser, updateUserAvatar,
 } = require('../controllers/users');
 
-router.get('/users', getUsers);
+router.get('', getUsers);
 
-router.get('/users/me', getUser);
+router.get('/me', getUser);
 
-router.get('/users/:userId', celebrate({
+router.get('/:userId', celebrate({
   query: {
     userId: Joi.string().hex().required(),
   },
 }), getUser);
 
-router.patch('/users/me', celebrate({
+router.patch('/me', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
     about: Joi.string().min(2).max(30).required(),
   }),
 }), updateUser);
 
-router.patch('/users/me/avatar', celebrate({
+router.patch('/me/avatar', celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().required().regex(URL_PATTERN),
   }),
