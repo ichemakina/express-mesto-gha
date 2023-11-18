@@ -2,23 +2,27 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
-const {
-  Created, ValidationError, UnauthorizedError, NotFoundError, ServerError,
-} = require('../utils/statusCode');
 
-module.exports.getUsers = (req, res) => {
+const Created = 200;
+const NotFoundError = require('../utils/notFoundError');
+const ServerError = require('../utils/serverError');
+const ValidationError = require('../utils/validationError');
+const UnauthorizedError = require('../utils/unauthorizedError');
+const ConflictError = require('../utils/conflictError');
+
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .orFail()
     .then((users) => res.send({ data: users }))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NotFoundError).send({ message: 'Пользователи не найдены' });
+        return next(new NotFoundError('Пользователи не найдены'));
       }
-      return res.status(ServerError).send({ message: 'Произошла ошибка' });
+      return next(new ServerError('Произошла ошибка'));
     });
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   let userId;
   if (req.params.userId) {
     userId = req.params.userId;
@@ -30,16 +34,16 @@ module.exports.getUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NotFoundError).send({ message: 'Пользователь не найден' });
+        return next(new NotFoundError('Пользователь не найден'));
       }
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(ValidationError).send({ message: 'Пользователь не найден' });
+        return next(new ValidationError('Пользователь не найден'));
       }
-      return res.status(ServerError).send({ message: 'Произошла ошибка' });
+      return next(new ServerError('Произошла ошибка'));
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -50,52 +54,49 @@ module.exports.createUser = (req, res) => {
     }))
     .then((user) => res.status(Created).send({ data: user }))
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(ValidationError).send({ message: 'Введены некоректные данные' });
+      if (err.code === 11000) {
+        return next(new ConflictError('Пользователь с таким email уже существует'));
       }
-      return res.status(ServerError).send({ message: 'Произошла ошибка' });
+      return next(new ServerError('Произошла ошибка'));
     });
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const { name, about } = req.body;
   User.findByIdAndUpdate(req.user._id, { name, about }, { new: true, runValidators: true })
     .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NotFoundError).send({ message: 'Пользователь не найден' });
+        return next(new NotFoundError('Пользователь не найден'));
       }
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(ValidationError).send({ message: 'Пользователь не найден' });
+        return next(new ValidationError('Пользователь не найден'));
       }
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(ValidationError).send({ message: 'Введены некоректные данные' });
-      }
-      return res.status(ServerError).send({ message: 'Произошла ошибка' });
+      return next(new ServerError('Произошла ошибка'));
     });
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const { avatar } = req.body;
   User.findByIdAndUpdate(req.user._id, { avatar }, { new: true, runValidators: true })
     .orFail()
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return res.status(NotFoundError).send({ message: 'Пользователь не найден' });
+        return next(new NotFoundError('Пользователь не найден'));
       }
       if (err instanceof mongoose.Error.CastError) {
-        return res.status(ValidationError).send({ message: 'Пользователь не найден' });
+        return next(new ValidationError('Пользователь не найден'));
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(ValidationError).send({ message: 'Введены некоректные данные' });
+        return next(new ValidationError('Введены некорректные данные'));
       }
-      return res.status(ServerError).send({ message: 'Произошла ошибка' });
+      return next(new ServerError('Произошла ошибка'));
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -104,6 +105,6 @@ module.exports.login = (req, res) => {
       return res.send({ token });
     })
     .catch(() => {
-      res.status(UnauthorizedError).send({ message: 'Ошибка авторизации' });
+      next(new UnauthorizedError('Ошибка авторизации'));
     });
 };

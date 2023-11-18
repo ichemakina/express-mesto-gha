@@ -5,11 +5,13 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const cookieParser = require('cookie-parser');
+const { errors } = require('celebrate');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
+const handleError = require('./middlewares/handleError');
 
 const app = express();
 
@@ -28,5 +30,8 @@ app.use(auth);
 
 app.use(users);
 app.use(cards);
+
+app.use(errors());
+app.use(handleError);
 
 app.listen(PORT);
