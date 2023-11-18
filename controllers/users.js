@@ -1,8 +1,9 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const {
-  Created, ValidationError, NotFoundError, ServerError,
+  Created, ValidationError, UnauthorizedError, NotFoundError, ServerError,
 } = require('../utils/statusCode');
 
 module.exports.getUsers = (req, res) => {
@@ -85,5 +86,23 @@ module.exports.updateUserAvatar = (req, res) => {
         return res.status(ValidationError).send({ message: 'Введены некоректные данные' });
       }
       return res.status(ServerError).send({ message: 'Произошла ошибка' });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', { expiresIn: '7d' });
+      return res
+        .cookie('jwt', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+        })
+        .end();
+    })
+    .catch(() => {
+      res.status(UnauthorizedError).send({ message: 'Ошибка авторизации' });
     });
 };

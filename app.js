@@ -7,6 +7,7 @@ const helmet = require('helmet');
 
 const users = require('./routes/users');
 const cards = require('./routes/cards');
+const { login, createUser } = require('./controllers/users');
 
 const app = express();
 
@@ -24,6 +25,9 @@ app.use((req, res, next) => {
 
   next();
 });
+
+app.post('/signin', login);
+app.post('/signup', createUser);
 
 app.use(users);
 app.use(cards);
