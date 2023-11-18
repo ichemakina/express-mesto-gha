@@ -52,13 +52,19 @@ module.exports.createUser = (req, res, next) => {
     .then((hash) => User.create({
       name, about, avatar, email, password: hash,
     }))
-    .then((user) => res.status(Created).send({ data: user }))
+    .then((user) => res.status(Created).send({
+      email: user.email,
+      name: user.name,
+      about: user.about,
+      avatar: user.avatar,
+      _id: user._id,
+    }))
     .catch((err) => {
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с таким email уже существует'));
       }
       if (err instanceof mongoose.Error.ValidationError) {
-        return next(new ValidationError('Введены некорреткные данные'));
+        return next(new ValidationError('Введены некорректные данные'));
       }
       return next(new ServerError('Произошла ошибка'));
     });
