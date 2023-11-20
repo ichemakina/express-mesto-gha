@@ -21,13 +21,13 @@ const validateRegister = celebrate({
 const validateCreateCard = celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30).required(),
-    link: Joi.string().required(),
+    link: Joi.string().required().regex(URL_PATTERN),
   }),
 });
 
 const validateCardId = celebrate({
   query: {
-    cardId: Joi.string().hex().required(),
+    cardId: Joi.string().length(24).hex().required(),
   },
 });
 
@@ -44,9 +44,9 @@ const validateUpdateAvatar = celebrate({
   }),
 });
 
-const validateUpdateUserId = celebrate({
+const validateUserId = celebrate({
   query: {
-    userId: Joi.string().hex().required(),
+    userId: Joi.string().length(24).hex().required(),
   },
 });
 
@@ -57,5 +57,5 @@ module.exports = {
   validateCardId,
   validateUpdateUser,
   validateUpdateAvatar,
-  validateUpdateUserId,
+  validateUserId,
 };
