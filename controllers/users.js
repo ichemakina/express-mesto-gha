@@ -11,12 +11,7 @@ const ConflictError = require('../utils/conflictError');
 module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch((err) => {
-      if (err instanceof mongoose.Error.DocumentNotFoundError) {
-        return next(new NotFoundError('Пользователи не найдены'));
-      }
-      return next();
-    });
+    .catch((err) => next(err));
 };
 
 module.exports.getUser = (req, res, next) => {
@@ -36,7 +31,7 @@ module.exports.getUser = (req, res, next) => {
       if (err instanceof mongoose.Error.CastError) {
         return next(new ValidationError('Пользователь не найден'));
       }
-      return next();
+      return next(err);
     });
 };
 
@@ -60,7 +55,7 @@ module.exports.createUser = (req, res, next) => {
       if (err.code === 11000) {
         return next(new ConflictError('Пользователь с таким email уже существует'));
       }
-      return next();
+      return next(err);
     });
 };
 
@@ -73,7 +68,7 @@ module.exports.updateUser = (req, res, next) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return next();
+      return next(err);
     });
 };
 
@@ -86,7 +81,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
       if (err instanceof mongoose.Error.DocumentNotFoundError) {
         return next(new NotFoundError('Пользователь не найден'));
       }
-      return next();
+      return next(err);
     });
 };
 
