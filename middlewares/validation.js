@@ -26,9 +26,9 @@ const validateCreateCard = celebrate({
 });
 
 const validateCardId = celebrate({
-  query: {
-    cardId: Joi.string().length(24).hex(),
-  },
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24).hex(),
+  }),
 });
 
 const validateUpdateUser = celebrate({
@@ -45,9 +45,9 @@ const validateUpdateAvatar = celebrate({
 });
 
 const validateUserId = celebrate({
-  query: {
-    userId: Joi.string().length(24).hex(),
-  },
+  params: Joi.object().keys({
+    userId: Joi.string().alphanum().length(24).hex(),
+  }),
 });
 
 module.exports = {
